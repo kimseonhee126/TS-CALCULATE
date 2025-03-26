@@ -1,6 +1,8 @@
 import React, { useReducer, useState } from "react";
 import "./App.css";
 import Button from "./components/Button";
+import Expression from "./components/Expression";
+import Result from "./components/Result";
 
 type Action =
   | {
@@ -154,9 +156,9 @@ function App() {
           ))}
         </div>
 
-        <div className="expression-container">{expression}</div>
+        <Expression value={expression} />
 
-        {resultFlag && <div className="result-container">{state}</div>}
+        <Result value={state} flag={resultFlag} />
       </div>
     </>
   );
