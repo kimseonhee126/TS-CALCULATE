@@ -40,7 +40,7 @@ function reducer(state: number, action: Action) {
     case "DIVIDE":
       current = state;
       operator = action.type;
-      return state;
+      return 0;
 
     case "EVALUATE":
       if (!operator) return state;
@@ -68,7 +68,10 @@ function reducer(state: number, action: Action) {
 
 function App() {
   const [state, dispatch] = useReducer(reducer, 0);
-  // const [expression, setExpression] = useState("");
+  const [expression, setExpression] = useState("");
+
+  // true 면 결과 보여주기
+  const [resultFlag, setResultFlag] = useState(false);
 
   const buttons = [
     { item: "1", type: "INPUT" },
@@ -88,11 +91,35 @@ function App() {
     { item: "CLEAR", type: "CLEAR" },
   ];
 
+  const convertOperatorToSymbol = (type: string) => {
+    switch (type) {
+      case "PLUS":
+        return "+";
+      case "MINUS":
+        return "-";
+      case "MULTIPLY":
+        return "×";
+      case "DIVIDE":
+        return "÷";
+      default:
+        return "";
+    }
+  };
+
   const onClickButton = (item: string, type: string) => {
     if (type === "INPUT") {
-      dispatch({ type: "INPUT", data: Number(item) });
+      dispatch({
+        type: "INPUT",
+        data: Number(item),
+      });
+      setExpression((prev) => prev + item);
+      setResultFlag(false);
     } else if (type === "EVALUATE") {
-      dispatch({ type: "EVALUATE" });
+      dispatch({
+        type: "EVALUATE",
+      });
+      setExpression("");
+      setResultFlag(true);
     } else if (
       type === "PLUS" ||
       type === "MINUS" ||
@@ -100,13 +127,15 @@ function App() {
       type === "DIVIDE"
     ) {
       dispatch({ type });
-    } else if (type === 'CLEAR') {
+      const operatorSymbol = convertOperatorToSymbol(type);
+      setExpression((prev) => prev + " " + operatorSymbol + " ");
+      setResultFlag(false);
+    } else if (type === "CLEAR") {
       dispatch({
-        type: 'CLEAR',
-      })
+        type: "CLEAR",
+      });
+      setResultFlag(false);
     }
-
-    console.log('현재 값 : ', state);
   };
 
   return (
@@ -125,7 +154,9 @@ function App() {
           ))}
         </div>
 
-        <div className="result-container">{state}</div>
+        <div className="expression-container">{expression}</div>
+
+        {resultFlag && <div className="result-container">{state}</div>}
       </div>
     </>
   );
